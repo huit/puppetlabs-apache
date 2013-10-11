@@ -1,15 +1,22 @@
 class apache::mod::passenger (
-  $passenger_high_performance     = undef,
-  $passenger_pool_idle_time       = undef,
-  $passenger_max_requests         = undef,
-  $passenger_stat_throttle_rate   = undef,
-  $rack_autodetect                = undef,
-  $rails_autodetect               = undef,
-  $passenger_root                 = $apache::params::passenger_root,
-  $passenger_ruby                 = $apache::params::passenger_ruby,
-  $passenger_max_pool_size        = undef,
+  $passenger_high_performance   = undef,
+  $passenger_pool_idle_time     = undef,
+  $passenger_max_requests       = undef,
+  $passenger_stat_throttle_rate = undef,
+  $rack_autodetect              = undef,
+  $rails_autodetect             = undef,
+  $passenger_root               = $apache::params::passenger_root,
+  $passenger_ruby               = $apache::params::passenger_ruby,
+  $passenger_max_pool_size      = undef,
+  $passenger_lib_path           = undef,
+  $passenger_mod_lib            = undef,
+  $passenger_manage_package     = true
 ) {
-  apache::mod { 'passenger': }
+  apache::mod { 'passenger':
+    lib_path       => $apache::mod::passenger::passenger_lib_path,
+    mod_lib        => $apache::mod::passenger::passenger_mod_lib,
+    manage_package => $apache::mod::passenger::passenger_manage_package,
+  }
   # Template uses:
   # - $passenger_root
   # - $passenger_ruby
