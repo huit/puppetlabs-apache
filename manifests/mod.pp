@@ -1,7 +1,9 @@
 define apache::mod (
   $package = undef,
   $lib = undef,
-  $mod_lib = undef
+  $mod_lib = undef,
+  $lib_path = undef,
+  $manage_package = true
 ) {
   if ! defined(Class['apache']) {
     fail('You must include the apache base class before using any apache defined resources')
@@ -9,6 +11,16 @@ define apache::mod (
 
   $mod = $name
   #include apache #This creates duplicate resources in rspec-puppet
+  $mod_dir = $apache::mod_dir
+
+  # Determine if we have special lib_path
+  if $lib_path {
+    $lib_path_REAL = $lib_path
+  }
+  else {
+    $lib_path_REAL = $apache::params::lib_path
+  }
+
 
   # Determine if we have special lib
   $mod_libs = $apache::params::mod_libs
@@ -34,7 +46,7 @@ define apache::mod (
   } elsif "${mod_package}" {
     $package_REAL = $mod_package
   }
-  if $package_REAL {
+  if ( $package_REAL and $manage_package ) {
     # $package_REAL may be an array
     package { $package_REAL:
       ensure  => present,
@@ -49,7 +61,7 @@ define apache::mod (
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    content => "LoadModule ${mod}_module ${lib_path}/${lib_REAL}\n",
+    content => "LoadModule ${mod}_module ${lib_path_REAL}/${lib_REAL}\n",
     require => [
       Package['httpd'],
       Exec["mkdir ${mod_dir}"],
