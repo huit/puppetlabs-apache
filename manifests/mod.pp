@@ -1,6 +1,7 @@
 define apache::mod (
   $package = undef,
-  $lib = undef
+  $lib = undef,
+  $mod_lib = undef
 ) {
   if ! defined(Class['apache']) {
     fail('You must include the apache base class before using any apache defined resources')
@@ -8,18 +9,21 @@ define apache::mod (
 
   $mod = $name
   #include apache #This creates duplicate resources in rspec-puppet
-  $lib_path = $apache::params::lib_path
-  $mod_dir = $apache::mod_dir
 
   # Determine if we have special lib
   $mod_libs = $apache::params::mod_libs
-  $mod_lib = $mod_libs[$mod] # 2.6 compatibility hack
-  if $lib {
-    $lib_REAL = $lib
-  } elsif $mod_lib {
-    $lib_REAL = $mod_lib
-  } else {
-    $lib_REAL = "mod_${mod}.so"
+  if $mod_lib {
+    $mod_lib_REAL = $mod_lib
+  }
+  else {
+    $mod_lib_REAL = $mod_libs[$mod] # 2.6 compatibility hack
+    if $lib {
+      $lib_REAL = $lib
+    } elsif $mod_lib_REAL {
+      $lib_REAL = $mod_lib_REAL
+    } else {
+      $lib_REAL = "mod_${mod}.so"
+    }
   }
 
   # Determine if we have a package
